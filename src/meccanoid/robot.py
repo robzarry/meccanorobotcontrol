@@ -14,9 +14,20 @@ from .protocol import REVERSED_SERVOS, SERVO_CENTER, SERVO_COUNT, Servo, ServoCo
 from .transport import Transport
 
 
+def _raw(servo: Servo, position: int) -> int:
+    """Convert a joint position to the value sent for that servo slot.
+    Mirrored servos are flipped so the same position means the same pose on
+    both arms; mirroring is its own inverse, so this also converts back."""
+    return 0xFF - position if servo in REVERSED_SERVOS else position
+
+
+def _centered() -> list[int]:
+    return [_raw(Servo(i), SERVO_CENTER) for i in range(SERVO_COUNT)]
+
+
 @dataclass
 class RobotState:
-    servos: list[int] = field(default_factory=lambda: [SERVO_CENTER] * SERVO_COUNT)
+    servos: list[int] = field(default_factory=_centered)  # raw values as sent
     servo_colors: list[int] = field(default_factory=lambda: [ServoColor.OFF] * SERVO_COUNT)
     eyes: tuple[int, int, int] = (7, 7, 7)
     chest: list[bool] = field(default_factory=lambda: [False] * 4)
@@ -49,11 +60,18 @@ class Robot:
     async def wake(self) -> None:
         await self._send(protocol.wake())
 
+    def joint_position(self, servo: Servo) -> int:
+        """The position as set_joint takes it (mirroring undone)."""
+        return _raw(servo, self.state.servos[servo])
+
     async def set_joint(self, servo: Servo, position: int) -> None:
         """Move one joint. position is 0-255; mirrored joints are corrected
         so the same value means the same pose on both arms."""
-        raw = 0xFF - position if servo in REVERSED_SERVOS else position
-        self.state.servos[servo] = raw
+        self.state.servos[servo] = _raw(servo, position)
+        await self._send(protocol.servo_positions(self.state.servos))
+
+    async def center_joints(self) -> None:
+        self.state.servos = _centered()
         await self._send(protocol.servo_positions(self.state.servos))
 
     async def set_servo_color(self, servo: Servo, color: ServoColor) -> None:

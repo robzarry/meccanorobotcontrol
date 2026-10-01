@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Meccanoid Control</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>Meccanoid</h1>
+      <span id="mode" class="badge" hidden>Mock robot</span>
+    </div>
+    <div class="conn">
+      <span id="status" class="status"><span class="dot"></span><span id="status-text">Offline</span></span>
+      <button id="connect" class="btn">Connect</button>
+    </div>
+  </header>
+
+  <div id="toast" class="toast" role="alert" hidden></div>
+
+  <main class="layout">
+    <section class="card preview-card">
+      <svg id="robot" viewBox="0 0 240 260" aria-label="Robot preview">
+        <!-- arms are rotated around their shoulder / elbow pivots by app.js -->
+        <g id="arm-left">
+          <rect x="44" y="92" width="16" height="50" rx="7" class="limb"/>
+          <g id="forearm-left">
+            <rect x="44" y="136" width="16" height="46" rx="7" class="limb"/>
+            <circle cx="52" cy="184" r="9" class="joint-dot"/>
+          </g>
+          <circle id="led-3" cx="52" cy="96" r="6" class="led"/>
+          <circle id="led-4" cx="52" cy="138" r="5" class="led"/>
+        </g>
+        <g id="arm-right">
+          <rect x="180" y="92" width="16" height="50" rx="7" class="limb"/>
+          <g id="forearm-right">
+            <rect x="180" y="136" width="16" height="46" rx="7" class="limb"/>
+            <circle cx="188" cy="184" r="9" class="joint-dot"/>
+          </g>
+          <circle id="led-2" cx="188" cy="96" r="6" class="led"/>
+          <circle id="led-1" cx="188" cy="138" r="5" class="led"/>
+        </g>
+        <rect x="66" y="84" width="108" height="104" rx="16" class="body"/>
+        <g id="chest">
+          <circle cx="102" cy="122" r="7" class="chest-led"/>
+          <circle cx="138" cy="122" r="7" class="chest-led"/>
+          <circle cx="102" cy="150" r="7" class="chest-led"/>
+          <circle cx="138" cy="150" r="7" class="chest-led"/>
+        </g>
+        <rect x="112" y="70" width="16" height="16" class="limb"/>
+        <rect x="76" y="16" width="88" height="58" rx="18" class="head"/>
+        <circle id="eye-l" cx="102" cy="44" r="10" class="eye"/>
+        <circle id="eye-r" cx="138" cy="44" r="10" class="eye"/>
+        <rect x="74" y="190" width="30" height="58" rx="10" class="wheel"/>
+        <rect x="136" y="190" width="30" height="58" rx="10" class="wheel"/>
+        <text id="wheel-l" x="89" y="224" class="wheel-label"></text>
+        <text id="wheel-r" x="151" y="224" class="wheel-label"></text>
+      </svg>
+      <div class="row">
+        <button class="btn" data-cmd="wake">Wake up</button>
+        <button class="btn" data-cmd="center">Centre arms</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Drive</h2>
+      <div class="pad" id="pad">
+        <span></span>
+        <button class="pad-btn" data-drive="forward" aria-label="Forward">▲</button>
+        <span></span>
+        <button class="pad-btn" data-drive="left" aria-label="Spin left">⟲</button>
+        <button class="pad-btn stop-mini" data-cmd="stop" aria-label="Stop">■</button>
+        <button class="pad-btn" data-drive="right" aria-label="Spin right">⟳</button>
+        <span></span>
+        <button class="pad-btn" data-drive="back" aria-label="Backward">▼</button>
+        <span></span>
+      </div>
+      <label class="slider">
+        <span>Speed <output id="speed-out">160</output></span>
+        <input id="speed" type="range" min="40" max="255" value="160">
+      </label>
+      <p class="hint">Hold a button to drive. Arrow keys or WASD also work. The robot stops when you let go.</p>
+    </section>
+
+    <section class="card">
+      <h2>Arms</h2>
+      <div id="joints"></div>
+      <details>
+        <summary>Other servo slots</summary>
+        <p class="hint">Slots the protocol has, but whose joint isn't known yet. Try them carefully.</p>
+        <div id="joints-extra"></div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>Eyes</h2>
+      <div class="swatches" id="eye-swatches"></div>
+      <div id="eye-sliders"></div>
+
+      <h2>Chest lights</h2>
+      <div class="toggles" id="chest-toggles"></div>
+
+      <h2>Servo lights</h2>
+      <div id="servo-colors"></div>
+    </section>
+  </main>
+
+  <button id="stop" class="stop" data-cmd="stop">STOP</button>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
