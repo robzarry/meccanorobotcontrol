@@ -9,6 +9,9 @@ reverse-engineering work in [pymecca](https://github.com/iamsrp/pymecca).
 > Status: protocol library, hardware probe and web control panel are in place.
 > Not yet verified against a real G15; see "First check" below.
 
+The [development story](docs/STORY.md) ([PDF](docs/STORY.pdf)) tells how the
+project was built, milestone by milestone.
+
 ## How it fits together
 
 ```
